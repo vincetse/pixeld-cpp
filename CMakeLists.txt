@@ -20,11 +20,16 @@ endif()
 
 # --- Static & Optimized Config ---
 if(STATIC_RELEASE_BUILD)
-    # Apply -O3 to the server
+    # 1. Apply -O3 optimization
     target_compile_options("pixeld++" PRIVATE -O3)
 
-    # Apply static linking flags to the server
-    set_target_properties("pixeld++" PROPERTIES LINK_FLAGS "-static -static-libgcc -static-libstdc++")
+    # 2. Force true static linking and disable PIE
+    # -static: No dynamic linking
+    # -no-pie: Disables Position Independent Executable (crucial for 'scratch')
+    # -s: Strips symbols (reduces size from ~10MB to ~2MB)
+    set_target_properties("pixeld++" PROPERTIES
+        LINK_FLAGS "-static -no-pie -s -static-libgcc -static-libstdc++"
+    )
 endif()
 
 # 4. Common Configuration
