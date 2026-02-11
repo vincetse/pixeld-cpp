@@ -11,7 +11,7 @@ jobs:
       contents: read
       actions: write
     container:
-      image: alpine:3.19
+      image: alpine:3.23
 
     steps:
       - name: Install System Dependencies
