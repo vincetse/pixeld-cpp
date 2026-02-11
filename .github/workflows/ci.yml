@@ -48,9 +48,14 @@ jobs:
 
       - name: Verify Static Binary
         run: |
-          # Ensure it is truly static (ldd should return 'Not a dynamic executable')
-          file build/pixeld++
-          ! ldd build/pixeld++ 2>&1 | grep -E "libc.musl|ld-musl"
+          # 1. Verify via 'file' command
+          file build/pixeld++ | grep "statically linked"
+
+          # 2. Verify via 'ldd' (expecting a "Not a dynamic executable" error)
+          # We use '|| true' because ldd returns an error code for static binaries
+          OUTPUT=$(ldd build/pixeld++ 2>&1 || true)
+          echo "$OUTPUT"
+          echo "$OUTPUT" | grep -q "Not a dynamic executable"
 
       - name: Upload Production Binary
         uses: actions/upload-artifact@v4
