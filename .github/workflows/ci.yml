@@ -16,7 +16,10 @@ jobs:
     steps:
       - name: Install System Dependencies
         run: |
-          apk add --no-cache g++ cmake make git asio-dev lcov curl gzip file gcompat
+          apk add --no-cache g++ \
+            cmake make git asio-dev \
+            lcov curl gzip file gcompat \
+            libc6-compat
 
       - name: Checkout Code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
