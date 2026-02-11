@@ -30,7 +30,9 @@ jobs:
           files: coverage/lcov.info
 
       - name: Build Static Production Binary (-O3)
-        run: make static
+        run: |
+          make clean
+          make static
 
       - name: Verify Static Binary
         run: |

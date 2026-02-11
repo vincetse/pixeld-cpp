@@ -4,32 +4,34 @@ project("pixeld++" VERSION 1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# 1. Find Dependencies
 find_package(Threads REQUIRED)
 
-# --- 1. Coverage Flags (Build 1) ---
+# 2. DEFINE THE TARGETS FIRST
+add_executable("pixeld++" "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
+add_executable(app_test "${CMAKE_CURRENT_SOURCE_DIR}/test/app_test.cpp")
+
+# 3. NOW CONFIGURE THE DEFINED TARGETS
+# --- Coverage Config ---
 if(CMAKE_BUILD_TYPE STREQUAL "Coverage")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -O0")
+    target_compile_options(app_test PRIVATE --coverage -O0)
+    target_link_libraries(app_test PRIVATE --coverage)
 endif()
 
-# --- 2. Dynamic/Debug Flags (Build 2) ---
-if(DYNAMIC_DEBUG_BUILD)
-    target_compile_options("pixeld++" PRIVATE -O0 -g)
-    # Ensure it stays dynamic (default behavior, but explicit for clarity)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic")
-endif()
-
-# --- 3. Static/Optimized Flags (Build 3) ---
+# --- Static & Optimized Config ---
 if(STATIC_RELEASE_BUILD)
+    # Apply -O3 to the server
     target_compile_options("pixeld++" PRIVATE -O3)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++")
+
+    # Apply static linking flags to the server
+    set_target_properties("pixeld++" PROPERTIES LINK_FLAGS "-static -static-libgcc -static-libstdc++")
 endif()
 
-# Targets
-add_executable("pixeld++" "src/main.cpp")
-target_include_directories("pixeld++" PRIVATE "src")
-target_link_libraries("pixeld++" PRIVATE Threads::Threads)
-
-add_executable(app_test "test/app_test.cpp")
+# 4. Common Configuration
 target_compile_definitions(app_test PRIVATE UNIT_TEST)
-target_include_directories(app_test PRIVATE "src" "test")
+
+target_include_directories("pixeld++" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
+target_include_directories(app_test PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src" "${CMAKE_CURRENT_SOURCE_DIR}/test")
+
+target_link_libraries("pixeld++" PRIVATE Threads::Threads)
 target_link_libraries(app_test PRIVATE Threads::Threads)

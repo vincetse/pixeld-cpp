@@ -16,12 +16,12 @@ coverage:
 	@echo "LCOV report generated at: $(COV_DIR)/lcov.info"
 
 # BUILD 2: Dynamically linked, -O0, Debug symbols
-dynamic: clean
+dynamic:
 	@mkdir -p $(BUILD_DIR)
 	@cd $(BUILD_DIR) && cmake -DDYNAMIC_DEBUG_BUILD=ON -DCMAKE_BUILD_TYPE=Debug .. && make $(BINARY)
 
 # BUILD 3: Statically linked, -O3, Production Ready
-static: clean
+static:
 	@mkdir -p $(BUILD_DIR)
 	@cd $(BUILD_DIR) && cmake -DSTATIC_RELEASE_BUILD=ON -DCMAKE_BUILD_TYPE=Release .. && make $(BINARY)
 
