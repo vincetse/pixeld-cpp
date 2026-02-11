@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install System Dependencies
         run: |
@@ -38,7 +38,7 @@ jobs:
           echo "Coverage binary verified: Dynamic and Instrumented."
 
       - name: Upload Coverage to Qlty
-        uses: qltysh/qlty-action/coverage@v2
+        uses: qltysh/qlty-action/coverage@a19242102d17e497f437d7466aa01b528537e899 # v2.2.0
         with:
           token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
           files: coverage/lcov.info
@@ -53,7 +53,7 @@ jobs:
       image: alpine:3.23
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install Build Dependencies
         run: |
@@ -78,7 +78,7 @@ jobs:
           echo "Binary is confirmed static and ready for production."
 
       - name: Upload Production Binary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: pixeld-static-binary
           path: build/pixeld++
