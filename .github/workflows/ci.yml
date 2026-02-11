@@ -1,0 +1,47 @@
+name: CI
+
+on: on: [push, pull_request]
+
+permissions: {}
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    container:
+      image: alpine:3.19
+
+    steps:
+      - name: Install System Dependencies
+        run: |
+          apk add --no-cache g++ cmake make git asio-dev lcov curl
+
+      - name: Checkout Code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup Project
+        run: make setup # Fetches crow_all.h and catch.hpp
+
+      - name: Run Coverage Build
+        run: make coverage
+
+      - uses: qltysh/qlty-action/coverage@a19242102d17e497f437d7466aa01b528537e899 # v2.2.0
+        with:
+          token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
+          files: coverage/lcov.info
+
+      - name: Build Static Production Binary (-O3)
+        run: make static
+
+      - name: Verify Static Binary
+        run: |
+          file build/pixeld++
+          ! ldd build/pixeld++
+
+      - name: Upload Production Binary
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: pixeld-static-binary
+          path: build/pixeld++

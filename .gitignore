@@ -1,0 +1,38 @@
+# --- Build Artifacts ---
+build/
+bin/
+coverage/
+out/
+dist/
+*.o
+*.obj
+*.exe
+*.out
+*.info
+pixeld++
+app_test
+
+# --- CMake Generated ---
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+_deps/
+
+# --- Environment & Debug ---
+.env
+*.log
+*.d
+*.pdb
+*.ilk
+.cache/
+
+# --- IDE Specific ---
+.vscode/
+.idea/
+.vs/
+*.swp
+*.user
+.DS_Store
