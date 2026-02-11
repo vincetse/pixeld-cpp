@@ -40,7 +40,7 @@ jobs:
 
       - name: Install Build Dependencies
         run: |
-          apk add --no-cache g++ cmake make git asio-dev
+          apk add --no-cache g++ cmake make git asio-dev file
 
       - name: Build Static Production Binary (-O3)
         run: |
