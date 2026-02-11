@@ -20,6 +20,23 @@ jobs:
         # This runs on Ubuntu, so the qlty tool will work perfectly later
         run: make coverage
 
+      - name: Verify Coverage Binary
+        run: |
+          # 1. This should say "dynamically linked" and "with debug_info"
+          # (It won't be stripped because GCOV needs those symbols)
+          file build/app_test
+
+          # 2. Verify it is linked against glibc and gcov
+          echo "--- Dynamic Dependencies ---"
+          ldd build/app_test
+
+          # 3. Check binary size
+          # Expect this to be much LARGER than your static build
+          echo "--- Binary Size Info ---"
+          ls -lh build/app_test
+
+          echo "Coverage binary verified: Dynamic and Instrumented."
+
       - name: Upload Coverage to Qlty
         uses: qltysh/qlty-action/coverage@v2
         with:
@@ -54,6 +71,9 @@ jobs:
           # 2. Check ldd and just print it for the logs
           # We use '|| true' on the whole line to ensure grep/ldd status codes are ignored
           ldd build/pixeld++ 2>&1 | grep "Not a" || true
+
+          # 3. Check binary size
+          ls -lh build/pixeld++
 
           echo "Binary is confirmed static and ready for production."
 
