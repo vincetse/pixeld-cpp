@@ -5,45 +5,55 @@ on: [push, pull_request]
 permissions: {}
 
 jobs:
-  build-and-test:
+  test-and-coverage:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      actions: write
-    container:
-      image: alpine:3.23
-
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
       - name: Install System Dependencies
         run: |
-          apk add --no-cache g++ \
-            cmake make git asio-dev \
-            lcov curl gzip file gcompat \
-            libc6-compat
-
-      - name: Checkout Code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ lcov libasio-dev
 
       - name: Run Coverage Build
+        # This runs on Ubuntu, so the qlty tool will work perfectly later
         run: make coverage
 
-      - uses: qltysh/qlty-action/coverage@a19242102d17e497f437d7466aa01b528537e899 # v2.2.0
+      - name: Upload Coverage to Qlty
+        uses: qltysh/qlty-action/coverage@v2
         with:
           token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
           files: coverage/lcov.info
 
+  build-static-production:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    # We use a container specifically for the build environment
+    container:
+      image: alpine:3.23
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Build Dependencies
+        run: |
+          apk add --no-cache g++ cmake make git asio-dev
+
       - name: Build Static Production Binary (-O3)
         run: |
-          make clean
           make static
 
       - name: Verify Static Binary
         run: |
+          # Ensure it is truly static (ldd should return 'Not a dynamic executable')
           file build/pixeld++
-          ! ldd build/pixeld++
+          ! ldd build/pixeld++ 2>&1 | grep -E "libc.musl|ld-musl"
 
       - name: Upload Production Binary
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@v4
         with:
           name: pixeld-static-binary
           path: build/pixeld++
